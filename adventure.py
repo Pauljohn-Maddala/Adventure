@@ -77,7 +77,7 @@ class AdventureGame:
                 command = input().strip().lower()
                 self.process_command(command)
             except EOFError:
-                print("\nUse 'quit' to exit the game.")  # Message when Ctrl-D is pressed
+                print("\nUse 'quit' to exit.")
                 continue
 
     def process_command(self, command):
