@@ -50,9 +50,13 @@ class AdventureGame:
     def start_game(self):
         self.look()
         while True:
-            print("What would you like to do?",end=" ")
-            command = input("").strip().lower()
-            self.process_command(command)
+            try:
+                print("What would you like to do?",end=" ")
+                command = input().strip().lower()
+                self.process_command(command)
+            except EOFError:
+                print("\nUse 'quit' to exit the game.")  # Message when Ctrl-D is pressed
+                continue
 
     def process_command(self, command):
         command_parts = command.split()
@@ -93,7 +97,7 @@ class AdventureGame:
         elif base_command == "exits":
             self.show_exits()
         elif base_command == "quit":
-            print("Thank you for playing!")
+            print("Goodbye!")
             sys.exit(0)
         else:
             print("Invalid command. Try 'help' for a list of valid commands.")
@@ -114,6 +118,8 @@ class AdventureGame:
                     print("The door is locked. You need something to unlock it.")
             else:
                 self.current_location = next_location_index
+                print("You go "+direction+".")
+                print()
                 self.look()
                 self.check_conditions()
         else:
