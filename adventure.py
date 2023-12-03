@@ -117,7 +117,7 @@ class AdventureGame:
                 self.look()
                 self.check_conditions()
         else:
-            print("You can't go that way.")
+            print("There's no way to go "+ direction + ".")
     
     def check_conditions(self):
         location = self.game_map[self.current_location]
@@ -152,7 +152,7 @@ class AdventureGame:
         exits = location.get("exits", {})
         exits_description = " ".join(sorted(exits.keys()))
         print(f"Exits: {exits_description}\n")
-        #print("What would you like to do?",end=" ")
+        #print("What would you like to do?",end=" ") 
 
     def handle_get_command(self, command_parts):
         if len(command_parts) > 1:
