@@ -17,8 +17,8 @@ class AdventureGame:
         print("Welcome to the One Piece Adventure Game!")
         self.look()
         while True:
-            print("What would you like to do?")
-            command = input("> ").strip().lower()
+            #print("What would you like to do?")
+            command = input().strip().lower()
             self.process_command(command)
 
     def process_command(self, command):
@@ -82,7 +82,7 @@ class AdventureGame:
 
     def ask_for_clarification(self, possible_commands):
         print("Did you mean one of these commands? " + ", ".join(possible_commands))
-        choice = input("> ").strip().lower()
+        choice = input().strip().lower()
         if choice in possible_commands:
             self.process_command(choice)  # Re-process the clarified command
         else:
@@ -111,9 +111,23 @@ class AdventureGame:
 
     def look(self):
         location = self.game_map[self.current_location]
-        print(location["desc"])
-        self.show_items()
-        self.show_exits()
+
+        # Print the location name (title)
+        print(f"> {location['name']}\n")
+
+        # Print the description
+        print(f"{location['desc']}\n")
+
+        # Print the exits
+        exits = location.get("exits", {})
+        if exits:
+            exits_description = ", ".join(f"{dir}: {self.game_map[exits[dir]]['name']}" for dir in sorted(exits))
+            print(f"Exits: {exits_description}\n")
+        else:
+            print("No exits.\n")
+
+        # Print the prompt
+        print("What would you like to do?")
     
     def handle_get_command(self, command_parts):
         if len(command_parts) > 1:
@@ -136,7 +150,7 @@ class AdventureGame:
 
     def ask_for_item_clarification(self, matching_items):
         print("Did you mean one of these items? " + ", ".join(matching_items))
-        choice = input("> ").strip().lower()
+        choice = input().strip().lower()
         if choice in matching_items:
             self.pick_up_item(choice)
         else:
@@ -148,8 +162,14 @@ class AdventureGame:
             location["items"].remove(item_name)
             self.player_inventory.append(item_name)
             print(f"You picked up the {item_name}.")
-            if item_name == "One Piece" or item_name == "One":
-                self.check_win_condition()
+            if item_name == "One Piece":
+                self.check_
+                print("You picked up the One Piece and lost the game. Game over!")
+                sys.exit(0)
+            elif item_name == "meat":
+                print("You found the delicious meat and won the game! Congratulations!")
+                sys.exit(0)
+
         else:
             print("That item is not here.")
 
@@ -221,13 +241,6 @@ class AdventureGame:
         print("  help - Display this help message.")
         print("  quit - Exit the game.")
 
-    def check_win_condition(self):
-        # Assuming the last location in your game map is where the player wins the game
-        win_location_name = self.game_map[-1]["name"]
-
-        if "One Piece" in self.player_inventory and self.game_map[self.current_location]["name"] == win_location_name:
-            print("Congratulations! You have found the One Piece and won the game!")
-            sys.exit(0)
 
 
 def main():
@@ -241,3 +254,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
