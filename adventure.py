@@ -50,6 +50,7 @@ class AdventureGame:
     def start_game(self):
         self.look()
         while True:
+            print("What would you like to do?",end=" ")
             command = input("").strip().lower()
             self.process_command(command)
 
@@ -151,7 +152,7 @@ class AdventureGame:
         exits = location.get("exits", {})
         exits_description = " ".join(sorted(exits.keys()))
         print(f"Exits: {exits_description}\n")
-        print("What would you like to do?",end=" ")
+        #print("What would you like to do?",end=" ")
 
     def handle_get_command(self, command_parts):
         if len(command_parts) > 1:
