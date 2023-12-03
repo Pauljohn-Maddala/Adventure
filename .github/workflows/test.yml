@@ -1,0 +1,26 @@
+name: Python Adventure CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'  # You can specify the Python version you need
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        # If you have additional dependencies, install them here
+        # pip install -r requirements.txt
+
+    - name: Run Test Harness
+      run: |
+        chmod +x adventure.py loop.map
