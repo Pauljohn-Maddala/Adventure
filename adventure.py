@@ -62,6 +62,7 @@ class AdventureGame:
         self.game_map = None
         self.current_location = 0
         self.player_inventory = []
+        self.game_running = True
         self.load_map()
 
     def load_map(self):
@@ -70,7 +71,7 @@ class AdventureGame:
 
     def start_game(self):
         self.look()
-        while True:
+        while self.game_running:
             try:
                 print("What would you like to do?",end=" ")
                 command = input().strip().lower()
@@ -119,7 +120,7 @@ class AdventureGame:
             self.show_exits()
         elif base_command == "quit":
             print("Goodbye!")
-            sys.exit(0)
+            self.game_running = False 
         else:
             print("Invalid command. Try 'help' for a list of valid commands.")
 
@@ -156,11 +157,11 @@ class AdventureGame:
         win_condition = conditions.get("win")
         if win_condition and win_condition["item"] in self.player_inventory:
                 print(win_condition["message"])
-                sys.exit(0)
+                self.game_running = False 
         elif conditions.get("lose"):
             lose_condition = conditions.get("lose")
             print(lose_condition["message"])
-            sys.exit(0)
+            self.game_running = False 
 
         '''# Check losing condition
         lose_condition = conditions.get("lose")
@@ -253,7 +254,7 @@ class AdventureGame:
             #self.check_conditions()
             print("Inventory:")
             for i in self.player_inventory:
-                print(i)
+                print(" ",i)
         else:
             print("You're not carrying anything.")
 
@@ -290,7 +291,6 @@ def main():
     if len(sys.argv) < 2:
         print("Usage: python3 adventure.py [map_file]")
         return
-
     map_file = sys.argv[1]
     game = AdventureGame(map_file)
     game.start_game()
