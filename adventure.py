@@ -18,8 +18,7 @@ abbreviations = {
     "northwest": "northwest",
     "southeast": "southeast",
     "southwest": "southwest",
-    "i": "inventory",
-    "g": "get"
+    "i": "inventory"
     # Additional abbreviations as needed
 }
 
@@ -110,11 +109,13 @@ class AdventureGame:
             if next_location.get("locked", False) and "key" in next_location:
                 required_item = next_location["key"]
                 if required_item in self.player_inventory:
+                    print("You go "+direction+".")
                     print(f"Using {required_item} to unlock the door.")
                     self.current_location = next_location_index
                     self.look()
                     self.check_conditions()
                 else:
+                    print("You go "+direction+".")
                     print("The door is locked. You need something to unlock it.")
             else:
                 self.current_location = next_location_index
