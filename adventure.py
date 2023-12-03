@@ -216,7 +216,7 @@ class AdventureGame:
         if item_name in location.get("items", []):
             location["items"].remove(item_name)
             self.player_inventory.append(item_name)
-            print(f"You pick the {item_name}.")
+            print(f"You pick up the {item_name}.")
             # Immediately check for win/lose conditions after picking up an item
             self.check_conditions()
 
