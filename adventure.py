@@ -180,7 +180,7 @@ class AdventureGame:
         if items:
             print("Items: " + " ".join(items) + "\n")
         exits = location.get("exits", {})
-        exits_description = " ".join(sorted(exits.keys()))
+        exits_description = " ".join(exits.keys())
         print(f"Exits: {exits_description}\n")
         #print("What would you like to do?",end=" ") 
 
@@ -270,7 +270,7 @@ class AdventureGame:
         location = self.game_map[self.current_location]
         exits = location.get("exits", {})
         if exits:
-            print("Available exits:", " ".join(exits.keys().sort()))
+            print("Available exits:", " ".join(exits.keys()))
         else:
             print("There are no exits from here.")
 
