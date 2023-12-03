@@ -1,6 +1,40 @@
 import json
 import sys
 
+abbreviations = {
+    "n": "north",
+    "s": "south",
+    "e": "east",
+    "w": "west",
+    "ne": "northeast",
+    "nw": "northwest",
+    "se": "southeast",
+    "sw": "southwest",
+    "north": "north",
+    "south": "south",
+    "east": "east",
+    "west": "west",
+    "northeast": "northeast",
+    "northwest": "northwest",
+    "southeast": "southeast",
+    "southwest": "southwest",
+    "i": "inventory",
+    "g": "get"
+    # Additional abbreviations as needed
+}
+
+direction_abbreviations = {
+    "n": "north",
+    "e": "east",
+    "s": "south",
+    "w": "west",
+    "ne": "northeast",
+    "nw": "northwest",
+    "se": "southeast",
+    "sw": "southwest",
+    # Extend with other abbreviations as needed
+}
+
 class AdventureGame:
     def __init__(self, map_file):
         self.map_file = map_file
@@ -14,44 +48,33 @@ class AdventureGame:
             self.game_map = json.load(file)
 
     def start_game(self):
-        print("Welcome to the One Piece Adventure Game!")
         self.look()
         while True:
-            #print("What would you like to do?")
-            command = input().strip().lower()
+            command = input("").strip().lower()
             self.process_command(command)
 
     def process_command(self, command):
-        abbreviations = {
-            "n": ["north"],
-            "s": ["south"],
-            "e": ["east"],
-            "w": ["west"],
-            "ne": ["northeast"],
-            "nw": ["northwest"],
-            "se": ["southeast"],
-            "sw": ["southwest"],
-            "i": ["inventory", "items"],
-            "g": ["get", "go"]
-            
-            # Add more abbreviations as needed
-        }
-
         command_parts = command.split()
         base_command = command_parts[0]
 
-        # Handle abbreviations
+        # Check if command is an abbreviation and get its full form
         if base_command in abbreviations:
-            possible_commands = abbreviations[base_command]
-            if len(possible_commands) > 1:
-                self.ask_for_clarification(possible_commands)
-                return  # Return after clarification to avoid immediate command execution
-            else:
-                base_command = possible_commands[0]
+            base_command = abbreviations[base_command]
 
-        # Process the command
-        if base_command in ["north", "south", "east", "west", "northeast", "northwest", "southeast", "southwest"]:
-            self.move_player(base_command)
+        # Check if the command is a direction or a verb
+        if base_command in direction_abbreviations:
+            base_command = "go"
+
+       # Process the command as a movement if it's a direction or an abbreviation for a direction
+        if base_command in direction_abbreviations.values() or base_command in direction_abbreviations:
+            self.move_player(direction_abbreviations.get(base_command, base_command))
+        elif base_command == "go":
+            # Handle 'go' followed by a direction
+            if len(command_parts) > 1:
+                direction = direction_abbreviations.get(command_parts[1], command_parts[1])
+                self.move_player(direction)
+            else:
+                print("Sorry, you need to 'go' somewhere.")
         elif base_command == "look":
             self.look()
         elif base_command == "get":
@@ -71,24 +94,9 @@ class AdventureGame:
         elif base_command == "quit":
             print("Thank you for playing!")
             sys.exit(0)
-        elif base_command == "go":
-            # If 'go' is used, process the next part of the command as a direction
-            if len(command_parts) > 1 and command_parts[1] in ["north", "south", "east", "west", "northeast", "northwest", "southeast", "southwest"]:
-                self.move_player(command_parts[1])
-            else:
-                print("Invalid direction. Try 'help' for a list of valid commands.")
         else:
             print("Invalid command. Try 'help' for a list of valid commands.")
 
-    def ask_for_clarification(self, possible_commands):
-        print("Did you mean one of these commands? " + ", ".join(possible_commands))
-        choice = input().strip().lower()
-        if choice in possible_commands:
-            self.process_command(choice)  # Re-process the clarified command
-        else:
-            print("Invalid choice.")
-
-            
     def move_player(self, direction):
         current_location = self.game_map[self.current_location]
         if direction in current_location["exits"]:
@@ -100,78 +108,87 @@ class AdventureGame:
                     print(f"Using {required_item} to unlock the door.")
                     self.current_location = next_location_index
                     self.look()
+                    self.check_conditions()
                 else:
                     print("The door is locked. You need something to unlock it.")
             else:
                 self.current_location = next_location_index
                 self.look()
+                self.check_conditions()
         else:
             print("You can't go that way.")
+    
+    def check_conditions(self):
+        location = self.game_map[self.current_location]
+        conditions = location.get("conditions", {})
+        
+        # Check winning condition
+        win_condition = conditions.get("win")
+        if win_condition and win_condition["item"] in self.player_inventory:
+                print(win_condition["message"])
+                sys.exit(0)
+        elif conditions.get("lose"):
+            lose_condition = conditions.get("lose")
+            print(lose_condition["message"])
+            sys.exit(0)
 
-
+        '''# Check losing condition
+        lose_condition = conditions.get("lose")
+        #print(lose_condition["message"])
+        if lose_condition and win_condition["item"] not in self.player_inventory:
+            lose_condition = conditions.get("lose")
+            print(lose_condition["message"])
+            sys.exit(0)'''
+    
     def look(self):
         location = self.game_map[self.current_location]
-
-        # Print the location name (title)
+        self.check_conditions()
         print(f"> {location['name']}\n")
-
-        # Print the description
         print(f"{location['desc']}\n")
-
-        # Print the exits
+        items = location.get("items", [])
+        if items:
+            print("Items: " + " ".join(items) + "\n")
         exits = location.get("exits", {})
-        if exits:
-            exits_description = ", ".join(f"{dir}: {self.game_map[exits[dir]]['name']}" for dir in sorted(exits))
-            print(f"Exits: {exits_description}\n")
-        else:
-            print("No exits.\n")
+        exits_description = " ".join(sorted(exits.keys()))
+        print(f"Exits: {exits_description}\n")
+        print("What would you like to do?",end=" ")
 
-        # Print the prompt
-        print("What would you like to do?")
-    
     def handle_get_command(self, command_parts):
         if len(command_parts) > 1:
             item_abbr = " ".join(command_parts[1:])
             self.get_item_by_abbr(item_abbr)
+            self.check_conditions()
         else:
-            print("You must specify an item to get.")
+            print("Sorry, you need to 'get' something.")
 
     def get_item_by_abbr(self, item_abbr):
         location = self.game_map[self.current_location]
         matching_items = [item for item in location.get("items", []) if item.lower().startswith(item_abbr.lower())]
-
+        
         if len(matching_items) == 1:
             self.pick_up_item(matching_items[0])
         elif len(matching_items) > 1:
             self.ask_for_item_clarification(matching_items)
         else:
-            print("That item is not here.")
-
+            print("There's no "+str(item_abbr)+" anywhere.")
 
     def ask_for_item_clarification(self, matching_items):
         print("Did you mean one of these items? " + ", ".join(matching_items))
-        choice = input().strip().lower()
+        choice = input("").strip().lower()
         if choice in matching_items:
             self.pick_up_item(choice)
         else:
             print("Invalid item choice.")
-            
+
     def pick_up_item(self, item_name):
         location = self.game_map[self.current_location]
         if item_name in location.get("items", []):
             location["items"].remove(item_name)
             self.player_inventory.append(item_name)
-            print(f"You picked up the {item_name}.")
-            if item_name == "One Piece":
-                self.check_
-                print("You picked up the One Piece and lost the game. Game over!")
-                sys.exit(0)
-            elif item_name == "meat":
-                print("You found the delicious meat and won the game! Congratulations!")
-                sys.exit(0)
+            print(f"You pick the {item_name}.")
+            # Immediately check for win/lose conditions after picking up an item
+            self.check_conditions()
 
-        else:
-            print("That item is not here.")
 
     def handle_drop_command(self, command_parts):
         if len(command_parts) > 1:
@@ -187,9 +204,7 @@ class AdventureGame:
 
     def handle_trade_command(self, command_parts):
         current_location = self.game_map[self.current_location]
-
-        # Check if the player is in Syrup Village and there is a trader
-        if current_location["name"] == "Syrup Village" and "trader" in current_location:
+        if current_location.get("trader"):
             if len(command_parts) == 2:
                 item_to_trade = command_parts[1]
                 if item_to_trade in self.player_inventory and item_to_trade == current_location["trader"]["wants"]:
@@ -203,13 +218,14 @@ class AdventureGame:
         else:
             print("There is no one to trade with here.")
 
-
     def show_inventory(self):
         if self.player_inventory:
-            print("You are carrying:", ", ".join(self.player_inventory))
-            self.check_win_condition()
+            #self.check_conditions()
+            print("Inventory:")
+            for i in self.player_inventory:
+                print(i)
         else:
-            print("Your inventory is empty.")
+            print("You're not carrying anything.")
 
     def show_items(self):
         location = self.game_map[self.current_location]
@@ -223,10 +239,9 @@ class AdventureGame:
         location = self.game_map[self.current_location]
         exits = location.get("exits", {})
         if exits:
-            print("Available exits:", ", ".join(exits.keys()))
+            print("Available exits:", " ".join(exits.keys()))
         else:
             print("There are no exits from here.")
-
 
     def show_help(self):
         print("Available commands:")
@@ -240,8 +255,6 @@ class AdventureGame:
         print("  exits - Show all available exits from the current location.")
         print("  help - Display this help message.")
         print("  quit - Exit the game.")
-
-
 
 def main():
     if len(sys.argv) < 2:
