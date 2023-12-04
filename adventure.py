@@ -178,7 +178,7 @@ class AdventureGame:
             print("There's no "+str(item_abbr)+" anywhere.")
 
     def ask_for_item_clarification(self, matching_items):
-        print("Did you mean one of these items? " + ", ".join(matching_items))
+        print("Did you want to get the " + " or ".join(matching_items[:-1]) + " the "+matching_items[-1])
         choice = input("What would you like to do? ").strip().lower()
         if choice in matching_items:
             self.pick_up_item(choice)
