@@ -3,7 +3,8 @@ import sys
 
 abbreviations = {
     "g": ["get","go"],
-    "i": ["items","inventory"] 
+    "i": ["items","inventory"],
+    "inv": "inventory"
     # Additional abbreviations as needed
 }
 
@@ -160,7 +161,7 @@ class AdventureGame:
             print("Sorry, you need to 'get' something.")
     
     def ask_for_clarification(self, matching):
-        print("Did you want to go to " + " or ".join(matching))
+        print("Did you want to go " + ", ".join(matching) +"?")
         '''choice = input("").strip().lower()
         if choice in matching:
             self.process_command(choice)
@@ -178,7 +179,7 @@ class AdventureGame:
             print("There's no "+str(item_abbr)+" anywhere.")
 
     def ask_for_item_clarification(self, matching_items):
-        print("Did you want to get the " + " or ".join(matching_items[:-1]) + " the "+matching_items[-1])
+        print("Did you want to get the " + ", ".join(matching_items) + "?")
         choice = input("What would you like to do? ").strip().lower()
         if choice in matching_items:
             self.pick_up_item(choice)
