@@ -4,10 +4,9 @@ This repository contains the implementation of a game engine that loads and lets
 ```
 Name: Surya Teja Koritala, Paul John Maddala
 Stevens Login: skorital1@stevens.edu, pmaddala@stevens.edu 
-GitHub Repo: [https://github.com/Pauljohn-Maddala/Adventure.git]
 Hours spent on the project: 16 hours
 ```
-
+GitHub Repo: ["https://github.com/Pauljohn-Maddala/Adventure.git"]
 ## Testing
 I combined automated and manual testing to test the code. I created unit tests for every module's essential functionality using the pytest and other comparable frameworks for automated testing. I manually tested the game by playing it through various scenarios and maps to make sure everything works properly and there are no bugs. In order to make sure the three extensions function as intended, I also thoroughly tested each of them.
 * Eg: Command parsing
