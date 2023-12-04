@@ -2,45 +2,8 @@ import json
 import sys
 
 abbreviations = {
-    "n": "north",
-    "no": "north",
-    "nor": "north",
-    "nort": "north",
-    "north": "north",
-    "e": "east",
-    "ea": "east",
-    "eas": "east",
-    "east": "east",
-    "w": "west",
-    "we": "west",
-    "wes": "west",
-    "west": "west",
-    "s": "south",
-    "so": "south",
-    "sou": "south",
-    "sout": "south",
-    "south": "south",
-    "ne": "northeast",
-    "northe": "northeast",
-    "northea": "northeast",
-    "northeas": "northeast",
-    "northeast": "northeast",
-    "nw": "northwest",
-    "northw": "northwest",
-    "northwe": "northwest",
-    "northwes": "northwest",
-    "northwest": "northwest",
-    "se": "southeast",
-    "southe": "southeast",
-    "southea": "southeast",
-    "southeas": "southeast",
-    "southeast": "southeast",
-    "sw": "southwest",
-    "southw": "southwest",
-    "southwe": "southwest",
-    "southwes": "southwest",
-    "southwest": "southwest",
-    "i": "inventory"
+    "g": ["get","go"],
+    "i": ["items","inventory"] 
     # Additional abbreviations as needed
 }
 
@@ -87,13 +50,12 @@ class AdventureGame:
         # Check if command is an abbreviation and get its full form
         if base_command in abbreviations:
             base_command = abbreviations[base_command]
-
-        # Check if the command is a direction or a verb
-        if base_command in direction_abbreviations:
-            base_command = "go"
+            if type(base_command) == list:
+                self.ask_for_clarification(base_command)
+                
 
        # Process the command as a movement if it's a direction or an abbreviation for a direction
-        if base_command in direction_abbreviations.values() or base_command in direction_abbreviations:
+        elif base_command in direction_abbreviations.values() or base_command in direction_abbreviations:
             self.move_player(direction_abbreviations.get(base_command, base_command))
         elif base_command == "go":
             # Handle 'go' followed by a direction
@@ -129,25 +91,30 @@ class AdventureGame:
         if direction in current_location["exits"]:
             next_location_index = current_location["exits"][direction]
             next_location = self.game_map[next_location_index]
+            
+            # Check if the next location is locked and requires a key
             if next_location.get("locked", False) and "key" in next_location:
                 required_item = next_location["key"]
+                
+                # Check if the player has the required key to unlock the door
                 if required_item in self.player_inventory:
-                    print("You go "+direction+".")
+                    print(f"You go {direction}.")
                     print(f"Using {required_item} to unlock the door.")
                     self.current_location = next_location_index
                     self.look()
                     self.check_conditions()
                 else:
-                    print("You go "+direction+".")
+                    print(f"You go {direction}.")
                     print("The door is locked. You need something to unlock it.")
             else:
                 self.current_location = next_location_index
-                print("You go "+direction+".")
+                print(f"You go {direction}.")
                 print()
                 self.look()
                 self.check_conditions()
         else:
-            print("There's no way to go "+ direction + ".")
+            print(f"There's no way to go {direction}.")
+
     
     def check_conditions(self):
         location = self.game_map[self.current_location]
@@ -191,11 +158,18 @@ class AdventureGame:
             self.check_conditions()
         else:
             print("Sorry, you need to 'get' something.")
-
+    
+    def ask_for_clarification(self, matching):
+        print("Did you want to go to " + " or ".join(matching))
+        '''choice = input("").strip().lower()
+        if choice in matching:
+            self.process_command(choice)
+        else:
+            print(f"There's no way to go {choice}.")'''
+    
     def get_item_by_abbr(self, item_abbr):
         location = self.game_map[self.current_location]
         matching_items = [item for item in location.get("items", []) if item.lower().startswith(item_abbr.lower())]
-        
         if len(matching_items) == 1:
             self.pick_up_item(matching_items[0])
         elif len(matching_items) > 1:
@@ -205,7 +179,7 @@ class AdventureGame:
 
     def ask_for_item_clarification(self, matching_items):
         print("Did you mean one of these items? " + ", ".join(matching_items))
-        choice = input("").strip().lower()
+        choice = input("What would you like to do? ").strip().lower()
         if choice in matching_items:
             self.pick_up_item(choice)
         else:
@@ -297,4 +271,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
