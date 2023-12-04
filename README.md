@@ -109,6 +109,11 @@ Conditions are checked after each action, affecting the outcome of the game.
 Congratulations! You found the treasure! You win the game!
 
 ```
+```
+Conditions are checked after each action, affecting the outcome of the game.
+Oh no! You entered the dragon's lair without the protective shield. The dragon devours you, and your adventure comes to a tragic end.
+
+```
 
 
 ## 5. Direction Verbs
@@ -119,5 +124,65 @@ The game supports both full directions (north, south, east, west) and their abbr
 **Usage:**
 ```plaintext
 go [direction] - Move in the specified direction (north, south, east, west).
+```
+## Map File
+```
+[
+    {
+        "name": "Foosha Village",
+        "desc": "A small, peaceful village where your adventure begins.",
+        "items": ["straw hat"],
+        "exits": { "east": 1 },
+        "locked": false
+    },
+    {
+        "name": "Orange Town",
+        "desc": "A once vibrant town, now quiet. A locked door leads to the north.",
+        "items": ["key"],
+        "exits": { "west": 0, "north": 2 },
+        "locked": false
+    },
+    {
+        "name": "Syrup Village",
+        "desc": "A quaint village, known for its syrup production. A mysterious old sailor here offers a trade.",
+        "items": ["spyglass"],
+        "exits": { "south": 1, "east": 3 },
+        "locked": {"north": true},
+		"key": "key",
+        "trader": {
+            "wants": "spyglass",
+            "offers": "treasure map"
+        }
+    },
+    {
+        "name": "Baratie",
+        "desc": "A floating restaurant. The chef seems to be guarding a door leading east.",
+        "items": [],
+        "exits": { "west": 2, "east": 4 },
+        "locked": true,
+        "key": "treasure map"
+    },
+    {
+        "name": "Arlong Park",
+        "desc": "Once a fearsome pirate's stronghold. Rumors say the One Piece is hidden here.",
+        "items": ["one piece", "meat"],
+        "exits": { "west": 3 },
+        "locked": false,
+        "conditions": {
+        "win": {
+            "item": "meat",
+            "message": "Congratulations! You've won the game!"
+        },
+        "lose": {
+            "item": "one piece",
+            "message": "Oh no! You've lost the game."
+        }
+    	}
+    }
+]
+```
+
+
+
 
 
