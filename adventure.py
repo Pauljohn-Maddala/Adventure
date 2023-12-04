@@ -34,41 +34,41 @@ class AdventureGame:
             self.game_map = json.load(file)
 
     def start_game(self):
-        self.look()
-        while self.game_running:
-            try:
-                print("What would you like to do?",end=" ")
+         self.look()
+         while self.game_running:
+             try:
+                print("What would you like to do?", end=" ")
                 command = input().strip().lower()
-                self.process_command(command)
-            except EOFError:
+                new_location = self.process_command(command)
+                while new_location:
+                    print("What would you like to do?", end=" ")
+                    command = input().strip().lower()
+                    new_location = self.process_command(command)
+             except EOFError:
                 print("\nUse 'quit' to exit.")
-                continue
+
 
     def process_command(self, command):
         command_parts = command.split()
         base_command = command_parts[0]
 
         # Check if command is an abbreviation and get its full form
-        if base_command in abbreviations:
-            base_command = abbreviations[base_command]
-            if type(base_command) == list:
-                self.ask_for_clarification(base_command)
-                
-
-       # Process the command as a movement if it's a direction or an abbreviation for a direction
-        elif base_command in direction_abbreviations.values() or base_command in direction_abbreviations:
-            self.move_player(direction_abbreviations.get(base_command, base_command))
+        if base_command in direction_abbreviations.values() or base_command in direction_abbreviations:
+            return self.move_player(direction_abbreviations.get(base_command, base_command))
         elif base_command == "go":
             # Handle 'go' followed by a direction
             if len(command_parts) > 1:
                 direction = direction_abbreviations.get(command_parts[1], command_parts[1])
-                self.move_player(direction)
+                return self.move_player(direction)
             else:
                 print("Sorry, you need to 'go' somewhere.")
+                return None
         elif base_command == "look":
             self.look()
+            return None
         elif base_command == "get":
             self.handle_get_command(command_parts)
+            return None
         elif base_command == "drop":
             self.handle_drop_command(command_parts)
         elif base_command == "inventory":
@@ -83,9 +83,11 @@ class AdventureGame:
             self.show_exits()
         elif base_command == "quit":
             print("Goodbye!")
-            self.game_running = False 
+            self.game_running = False
+            return None
         else:
             print("Invalid command. Try 'help' for a list of valid commands.")
+            return None
 
     def move_player(self, direction):
         current_location = self.game_map[self.current_location]
